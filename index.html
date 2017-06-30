@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <title>首付准备金计算器</title>
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black" />
+  <meta name="format-detection" content="telephone=no,email=no" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=0"
+  />
+  <link rel="stylesheet" href="https://a.alipayobjects.com/g/antui/antui/10.0.18/dpl/antui.css" />
+  <link rel="stylesheet" href="https://a.alipayobjects.com/g/antui/antui/10.0.18/dpl/??widget/switch.css" />
+</head>
+
+<body>
+  <div class="main">
+    <div class="col">
+      <div class="am-list am-list-form">
+        <div class="am-list-header">首付准备金计算器</div>
+        <div class="am-list-body">
+          <div class="am-list-item am-input-autoclear">
+            <div class="am-list-label">总价</div>
+            <div class="am-list-control">
+              <input id="J_总价" type="text" placeholder="万元">
+            </div>
+            <div class="am-list-clear" tabindex="0" aria-label="清空输入框">
+              <i class="am-icon-clear am-icon" aria-hidden="true"></i>
+            </div>
+          </div>
+          <div class="am-list-item am-input-autoclear">
+            <div class="am-list-label">面积</div>
+            <div class="am-list-control">
+              <input id="J_面积" type="text" placeholder="平米">
+            </div>
+            <div class="am-list-clear" tabindex="0" aria-label="清空输入框">
+              <i class="am-icon-clear am-icon" aria-hidden="true"></i>
+            </div>
+          </div>
+          <div class="am-list-item">
+            <div class="am-list-content">是否满二</div>
+            <div class="am-switch">
+              <input type="checkbox" id="J_满二" class="am-switch-checkbox" checked="checked">
+              <label class="am-switch-label" for="J_满二">
+                      <div class="am-switch-inner"></div>
+                      <div class="am-switch-switch"></div>
+                    </label>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div id="J_output" style="display:none;">
+          <div class="am-list">
+            <div class="am-list-body">
+              <div class="am-list-item">
+                <div class="am-list-content">首付</div>
+                <div class="am-list-extra" id="J_首付"></div>
+              </div>
+              <div class="am-list-item">
+                <div class="am-list-content">契税</div>
+                <div class="am-list-extra" id="J_契税"></div>
+              </div>
+              <div class="am-list-item">
+                <div class="am-list-content">个税</div>
+                <div class="am-list-extra" id="J_个税"></div>
+              </div>
+              <div class="am-list-item">
+                <div class="am-list-content">营业税</div>
+                <div class="am-list-extra" id="J_营业税"></div>
+              </div>
+              <div class="am-list-item">
+                <div class="am-list-content">中介费</div>
+                <div class="am-list-extra" id="J_中介费"></div>
+              </div>
+              <div class="am-list-item">
+                <div class="am-list-content">准备金</div>
+                <div class="am-list-extra" id="J_准备金" style="color:red"></div>
+              </div>
+            </div>
+          </div>
+      </div>
+      <div class="am-wingblank wb15px">
+          <div class="am-whitespace ws10px"></div>
+          <button id="J_btnDo" type="button" class="am-button">计算准备金</button>
+          <div class="am-whitespace ws20px"></div>
+          <button id="J_btnReset" type="button" class="am-button white">清空</button>
+      </div>
+    </div>
+    <script src="https://a.alipayobjects.com/g/antui/antui/10.0.18/antui.js"></script>
+    <script src="https://a.alipayobjects.com/amui/zepto/1.1.3/zepto.js"></script>
+    <script>
+      $(function () {
+        function 准备金(总价, 面积, 满二) {
+          总价 = 总价 * 10000;
+          满二 = 满二 === false ? false : true; //默认满2
+
+          var 首付 = 总价 * 0.30;
+          var 契税 = 总价 * (面积 > 90 ? 0.015 : 0.01);
+          var 个税 = 总价 * 0.01;
+          var 营业税 = 满二 ? 0 : 总价 * 0.056;
+          var 中介费 = 1000000 * 0.03 + (总价 - 1000000) * 0.02;
+
+          var 准备金 = 首付 + 契税 + 个税 + 营业税 + 中介费;
+          return {
+            准备金: 准备金,
+            首付: 首付,
+            契税: 契税,
+            个税: 个税,
+            营业税: 营业税,
+            中介费: 中介费
+          };
+        };
+
+        var $总价 = $('#J_总价');
+        var $面积 = $('#J_面积');
+        var $满二 = $('#J_满二')[0];
+        var $杂项 = $('#J_杂项');
+
+        var $output = $('#J_output');
+        var $首付 = $('#J_首付');
+        var $契税 = $('#J_契税');
+        var $个税 = $('#J_个税');
+        var $营业税 = $('#J_营业税');
+        var $中介费 = $('#J_中介费');
+        var $准备金 = $('#J_准备金');
+        
+
+        $('#J_btnDo').on('click', function () {
+          var result = 准备金($总价.val(), $面积.val(), $满二.checked);
+          $output.show();
+
+          $首付.text(result.首付);
+          $契税.text(result.契税);
+          $个税.text(result.个税);
+          $营业税.text(result.营业税);
+          $中介费.text(result.中介费);
+          $准备金.text(result.准备金);
+        });
+        $('#J_btnReset').on('click', function(){
+          $output.hide();
+          $总价.val('');
+          $面积.val('');
+          $满二.checked = true;
+        });
+      });
+      
+    </script>
+</body>
+
+</html>
