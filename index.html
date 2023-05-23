@@ -46,10 +46,19 @@
             </div>
           </div>
           <div class="am-list-item">
-            <div class="am-list-content">是否满二</div>
+            <div class="am-list-content">是否满五</div>
             <div class="am-switch">
-              <input type="checkbox" id="J_满二" class="am-switch-checkbox" checked="checked">
-              <label class="am-switch-label" for="J_满二">
+              <input type="checkbox" id="J_满五" class="am-switch-checkbox" checked="checked">
+              <label class="am-switch-label" for="J_满五">
+                      <div class="am-switch-inner"></div>
+                      <div class="am-switch-switch"></div>
+                    </label>
+            </div>
+            <div class="am-list-item">
+            <div class="am-list-content">是否置换</div>
+            <div class="am-switch">
+              <input type="checkbox" id="J_置换" class="am-switch-checkbox" checked="checked">
+              <label class="am-switch-label" for="J_置换">
                       <div class="am-switch-inner"></div>
                       <div class="am-switch-switch"></div>
                     </label>
@@ -71,10 +80,6 @@
               <div class="am-list-item">
                 <div class="am-list-content">个税</div>
                 <div class="am-list-extra" id="J_个税"></div>
-              </div>
-              <div class="am-list-item">
-                <div class="am-list-content">营业税</div>
-                <div class="am-list-extra" id="J_营业税"></div>
               </div>
               <div class="am-list-item">
                 <div class="am-list-content">中介费</div>
@@ -99,49 +104,47 @@
     <script src="https://a.alipayobjects.com/amui/zepto/1.1.3/zepto.js"></script>
     <script>
       $(function () {
-        function 准备金(总价, 面积, 满二) {
+        function 二套准备金(总价, 面积, 满五, 置换) {
           总价 = 总价 * 10000;
-          满二 = 满二 === false ? false : true; //默认满2
+          满五 = 满五 === false ? false : true; //默认满五
+          置换 = 置换 === true ? true : false; //默认不置换，即二套
 
           var 首付 = 总价 * 0.30;
-          var 契税 = 总价 * (面积 > 90 ? 0.015 : 0.01);
-          var 个税 = 总价 * 0.01;
-          var 营业税 = 满二 ? 0 : 总价 * 0.056;
-          var 中介费 = 1000000 * 0.03 + (总价 - 1000000) * 0.02;
+          var 契税 = 总价 * (置换 ? 0.015 : 0.02);
+          var 个税 = 总价 * (满五 ? 0 : 0.01);
+          var 中介费 = 1000000 * 0.015 + (总价 - 1000000) * 0.01;
 
-          var 准备金 = 首付 + 契税 + 个税 + 营业税 + 中介费;
+          var 准备金 = 首付 + 契税 + 个税 + 中介费;
           return {
             准备金: 准备金,
             首付: 首付,
             契税: 契税,
             个税: 个税,
-            营业税: 营业税,
             中介费: 中介费
           };
         };
 
         var $总价 = $('#J_总价');
         var $面积 = $('#J_面积');
-        var $满二 = $('#J_满二')[0];
+        var $满五 = $('#J_满五')[0];
+        var $置换 = $('#J_置换')[0];
         var $杂项 = $('#J_杂项');
 
         var $output = $('#J_output');
         var $首付 = $('#J_首付');
         var $契税 = $('#J_契税');
         var $个税 = $('#J_个税');
-        var $营业税 = $('#J_营业税');
         var $中介费 = $('#J_中介费');
         var $准备金 = $('#J_准备金');
         
 
         $('#J_btnDo').on('click', function () {
-          var result = 准备金($总价.val(), $面积.val(), $满二.checked);
+          var result = 准备金($总价.val(), $面积.val(), $满五.checked, $置换.checked);
           $output.show();
 
           $首付.text(result.首付);
           $契税.text(result.契税);
           $个税.text(result.个税);
-          $营业税.text(result.营业税);
           $中介费.text(result.中介费);
           $准备金.text(result.准备金);
         });
@@ -149,7 +152,8 @@
           $output.hide();
           $总价.val('');
           $面积.val('');
-          $满二.checked = true;
+          $满五.checked = true;
+          $置换.checked = false;
         });
       });
       
